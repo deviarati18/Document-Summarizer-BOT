@@ -2,4 +2,6 @@ streamlit
 chromadb
 pandas
 ollama
-pypdf
+pymupdf
+
+

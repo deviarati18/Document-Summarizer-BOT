@@ -1,0 +1,43 @@
+/* styles.css */
+
+/* Custom CSS for the container with buttons */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;  /* Ensures buttons occupy full width */
+}
+
+/* Custom styling for Delete and View Summary buttons */
+.delete-btn, .view-summary-btn {
+    width: 100%; /* Makes the buttons stretch to the full width */
+    padding: 10px;
+    text-align: center;
+}
+
+/* Modal styling */
+.modal-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Darkened background for modal */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.modal-close-btn {
+    text-align: right;
+    font-size: 20px;
+    cursor: pointer;
+}
