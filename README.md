@@ -1,4 +1,4 @@
-# 🧠 ChromaDB + LLaMA Summarizer
+# 🧠 ChromaDB based Document Summarizer
 A document knowledge base powered by **ChromaDB** and **LLaMA models**, with a **Streamlit UI** for summarization and search.
 
 ## 🚀 Features
