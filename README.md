@@ -12,4 +12,9 @@ A document knowledge base powered by **ChromaDB** and **LLaMA models**, with a *
 ```sh
 git clone https://github.com/deviarati18/Document-summarizer.git
 cd Document-summarizer
+
+2️⃣ Install dependencies
+pip install -r requirements.txt
+
+3️⃣ Run the Streamlit app
 streamlit run ui.py
