@@ -10,6 +10,6 @@ A document knowledge base powered by **ChromaDB** and **LLaMA models**, with a *
 ## 🛠 Setup
 1️⃣ Clone the repository  
 ```sh
-git clone https://github.com/deviarati18/ChromaDB_LLaMA_Summarizer.git
+git clone https://github.com/deviarati18/Document-summarizer.git
 cd Document-summarizer
 streamlit run ui.py
