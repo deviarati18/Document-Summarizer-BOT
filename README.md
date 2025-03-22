@@ -12,3 +12,4 @@ A document knowledge base powered by **ChromaDB** and **LLaMA models**, with a *
 ```sh
 git clone https://github.com/deviarati18/ChromaDB_LLaMA_Summarizer.git
 cd Document-summarizer
+streamlit run ui.py
