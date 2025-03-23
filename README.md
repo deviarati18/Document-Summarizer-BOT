@@ -1,20 +1,32 @@
-# 🧠 ChromaDB based Document Summarizer
-A document knowledge base powered by **ChromaDB** and **LLaMA models**, with a **Streamlit UI** for summarization and search.
+🧠 RAG-Based Document Summarizer & FAQ Chatbot
+A Retrieval-Augmented Generation (RAG) system powered by ChromaDB and LLaMA models, featuring a Streamlit UI for document summarization and an FAQ chatbot.
 
-## 🚀 Features
-✅ Upload PDFs/TXT files  
-✅ Summarize using **LLaMA (Ollama API)**  
-✅ Store & Query summaries in **ChromaDB**  
-✅ **Web UI** for easy interaction  
+🚀 Features
+✅ Upload & Process Documents (PDF/TXT)
+✅ Summarization using LLaMA (Ollama API)
+✅ FAQ Chatbot with RAG-based retrieval
+✅ ChromaDB for storing & querying document knowledge
+✅ Multi-Document Support (store and query multiple files)
+✅ Web UI for seamless interaction
 
 ## 🛠 Setup
 1️⃣ Clone the repository  
 ```sh
-git clone https://github.com/deviarati18/Document-summarizer.git
-cd Document-summarizer
+git clone https://github.com/deviarati18/Document-Summarizer-FAQ.git
+cd Document-Summarizer-FAQ
 
-2️⃣ Install dependencies
+2️⃣ Create a Virtual Environment (Recommended)
+python -m venv venv
+venv\Scripts\activate
+
+3️⃣ Install Dependencies
 pip install -r requirements.txt
 
-3️⃣ Run the Streamlit app
+4️⃣ Run the Streamlit UI
 streamlit run ui.py
+
+📌 How It Works
+1️⃣ Upload a document (PDF/TXT).
+2️⃣ The system extracts and summarizes content using LLaMA (Ollama API).
+3️⃣ The summary is stored in ChromaDB for efficient retrieval.
+4️⃣ When a user asks a question, the FAQ chatbot retrieves relevant text using RAG and generates an answer.
