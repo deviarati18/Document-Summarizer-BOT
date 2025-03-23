@@ -1,13 +1,15 @@
-#🧠 RAG-Based Document Summarizer & FAQ Chatbot
-A Retrieval-Augmented Generation (RAG) system powered by ChromaDB and LLaMA models, featuring a Streamlit UI for document summarization and an FAQ chatbot.
+# 🧠 RAG-Based Document Summarizer & FAQ Chatbot  
 
-🚀 Features
-✅ Upload & Process Documents (PDF/TXT)
-✅ Summarization using LLaMA (Ollama API)
-✅ FAQ Chatbot with RAG-based retrieval
-✅ ChromaDB for storing & querying document knowledge
-✅ Multi-Document Support (store and query multiple files)
-✅ Web UI for seamless interaction
+**A Retrieval-Augmented Generation (RAG) system powered by ChromaDB and LLaMA models, featuring a Streamlit UI for document summarization and an FAQ chatbot.**  
+
+## 🚀 Features  
+
+✅ **Upload & Process Documents** (PDF/TXT)  
+✅ **Summarization** using **LLaMA (Ollama API)**  
+✅ **FAQ Chatbot** with RAG-based retrieval  
+✅ **ChromaDB** for **storing & querying** document knowledge  
+✅ **Multi-Document Support** (store and query multiple files)  
+✅ **Web UI** for seamless interaction 
 
 ## 🛠 Setup
 1️⃣ Clone the repository  
