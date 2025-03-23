@@ -1,6 +1,6 @@
-# 🧠 RAG-Based Document Summarizer & FAQ Chatbot  
+# 🧠 RAG-Based Document Summarizer &  Interactive QueryBot 
 
-**A Retrieval-Augmented Generation (RAG) system powered by ChromaDB and LLaMA models, featuring a Streamlit UI for document summarization and an FAQ chatbot.**  
+**A Retrieval-Augmented Generation (RAG) system powered by ChromaDB and LLaMA models, featuring a Streamlit UI for document summarization and an interactive chatbot.**  
 
 ## 🚀 Features  
 
@@ -14,8 +14,8 @@
 ## 🛠 Setup
 1️⃣ Clone the repository  
 ```sh
-git clone https://github.com/deviarati18/Document-Summarizer-FAQ.git
-cd Document-Summarizer-FAQ
+git clone https://github.com/deviarati18/Document-Summarizer-BOT.git
+cd Document-Summarizer-BOT
 
 2️⃣ Create a Virtual Environment (Recommended)
 python -m venv venv
