@@ -1,158 +1,178 @@
 import streamlit as st
 import tempfile
 import fitz  # PyMuPDF
+import os
+import pytesseract
+from PIL import Image
 from summarizer import LLaMASummarizer
-from chroma_manager import ChromaDBManager
+from chroma_db_manager import ChromaDBManager
 
 # Initialize services
 summarizer = LLaMASummarizer()
 db_manager = ChromaDBManager()
 
-st.title("📚 ChromaDB Knowledge Base with LLaMA Summarization")
+st.title("📚 AI-Powered Document Summarizer & FAQ Chatbot")
 
-# UI placeholders
-doc_preview_placeholder = st.empty()  # Placeholder for extracted document preview
-summary_placeholder = st.empty()  # Placeholder for summary output
+# === 📌 Create Tabs ===
+tab1, tab2 = st.tabs(["📂 Document Summarizer", "🤖 FAQ Chatbot"])
 
-# Check if document is in session state, if yes, skip re-upload
-if 'uploaded_file' in st.session_state:
-    uploaded_file = st.session_state.uploaded_file
-else:
-    uploaded_file = st.file_uploader("📂 Upload a document (PDF/TXT)", type=["pdf", "txt"])
+# ==============================
+# 📂 TAB 1: DOCUMENT SUMMARIZER (Displays Summary)
+# ==============================
+with tab1:
+    st.subheader("📂 Upload & Summarize Documents")
 
-# Session state variable to track the visibility of the stored documents
-if 'show_documents' not in st.session_state:
-    st.session_state.show_documents = False  # Initially set to False
+    uploaded_file = st.file_uploader("📂 Upload a PDF or TXT file", type=["pdf", "txt"])
 
-# Button to toggle the display of stored documents
-if st.button("📂 Show/Hide Stored Documents"):
-    st.session_state.show_documents = not st.session_state.show_documents
+    if uploaded_file:
+        file_name = uploaded_file.name
 
-# If "Show Documents" is True, display the stored documents
-if st.session_state.show_documents:
-    doc_list = db_manager.list_documents()  # Get list of stored documents
-    if doc_list:
-        st.write("### 📜 Stored Documents:")
-        for doc_name in doc_list:
-            # Create three columns for file name, view summary, and delete button
-            col1, col2, col3 = st.columns([4, 2, 2])
-            
-            with col1:
-                st.write(f"📄 **{doc_name}**")
-            
-            with col2:
-                # Button to toggle summary visibility
-                show_summary_button = st.button(f"👁️ View Summary of {doc_name}", key=f"view_summary_{doc_name}")
-                
-                # Check if the summary is already visible for this document
-                if 'summary_visible' not in st.session_state:
-                    st.session_state['summary_visible'] = {}  # Initialize if not exists
-
-                # Toggle the visibility of summary
-                if show_summary_button:
-                    st.session_state['summary_visible'][doc_name] = not st.session_state['summary_visible'].get(doc_name, False)
-
-            with col3:
-                # Button to delete the document
-                delete_button = st.button(f"❌ Delete {doc_name}", key=f"delete_{doc_name}")
-                if delete_button:
-                    # Trigger the deletion and refresh the UI
-                    db_manager.delete_document(doc_name)
-                    st.success(f"✅ Deleted {doc_name}.")
-                    st.experimental_rerun()  # Refresh UI after deletion
-
-            # If summary is visible, display it in a new line below the document
-            if st.session_state['summary_visible'].get(doc_name, False):
-                summary = db_manager.get_summary(doc_name)  # Get summary using the new method
-                if summary:
-                    st.write(f"### Summary for {doc_name}:")
-                    st.write(summary)
-                else:
-                    st.write("⚠️ Summary not found.")
-    else:
-        st.write("⚠️ No documents stored in the database.")
-
-# Handle document upload and summarization
-if uploaded_file:
-    # Check if the document is already stored in the knowledge base
-    if db_manager.is_document_stored(uploaded_file.name):
-        st.warning("⚠️ This document has already been processed and stored!")
-        st.stop()
-
-    # Store file in temporary location
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as temp_file:
-        temp_file.write(uploaded_file.getbuffer())
-        file_path = temp_file.name
-
-    # Extract text from the document
-    ext = uploaded_file.name.split(".")[-1].lower()
-    text = ""
-    
-    with st.spinner("📖 Extracting text from document..."):
-        if ext == "pdf":
-            doc = fitz.open(file_path)
-            text = "\n".join([page.get_text("text") for page in doc])
-        elif ext == "txt":
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                text = f.read()
-        else:
-            st.error("❌ Unsupported file type.")
+        # Check file size limit (5MB)
+        if uploaded_file.size > 5 * 1024 * 1024:
+            st.error("❌ File size too large! Please upload a smaller file (max 5MB).")
             st.stop()
 
-    if not text.strip():
-        st.error("❌ No text extracted from file!")
-        st.stop()
-
-    st.success("✅ Text extracted successfully!")
-    doc_preview_placeholder.text_area("📜 Extracted Document Preview:", text[:500], height=200)
-
-    # Summarize and Store
-    with st.spinner("📝 Summarizing document... This might take a few seconds!"):
-        summary = summarizer.summarize(text)
-
-    if not summary.strip():
-        st.error("❌ Summarization failed! Check model logs.")
-        st.stop()
-
-    st.success("✅ Summarization completed!")
-    summary_placeholder.text_area("📃 **Summary Preview:**", summary, height=200)
-
-    # Store the summary in the knowledge base
-    with st.spinner("💾 Storing summary in ChromaDB..."):
-        db_manager.add_summary(uploaded_file.name, summary)
-
-    st.success("✅ Document summarized and stored in Knowledge Base!")
-
-    # Reset the session state to clear the document state after summarization
-    del st.session_state.uploaded_file
-
-    # **Clear Extracted Document Preview after summarization**
-    doc_preview_placeholder.empty()
-
-# Query the Knowledge Base
-query = st.text_input("🔍 Search the knowledge base")
-
-if query:
-    with st.spinner("🔎 Searching knowledge base..."):
-        results = db_manager.search(query)
-
-    # Filter out unwanted error message from the results (if any)
-    
-
-    if results:
-        
-        st.write("**🔍 Search Results:**")
-        
-        # Assuming the result is structured as a dictionary with a 'text' key or directly as text
-        first_result = results[0]
-        
-        # If first_result is a dictionary, we are assuming the actual content is under a key like 'text' or 'content'
-        if isinstance(first_result, dict):
-            result_content = first_result.get('text', '')  # Adjust this key based on your actual data structure
+        # Check if document is already stored
+        if db_manager.is_document_stored(file_name):
+            st.warning("⚠️ This document has already been processed!")
+            existing_summary = db_manager.get_summary(file_name)
+            
+            if existing_summary and isinstance(existing_summary, str) and existing_summary.strip():
+                st.success("✅ Stored Summary:")
+                st.text_area("📃 Summary:", existing_summary, height=200)
+            else:
+                st.warning("⚠️ No stored summary found for this document.")
         else:
-            result_content = first_result  # If it's plain text, use it directly
+            # Save uploaded file to temporary storage
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_name.split('.')[-1]}") as temp_file:
+                temp_file.write(uploaded_file.getbuffer())
+                file_path = temp_file.name
 
-        # Display the clean result content without index or unnecessary details
-        st.write(result_content)
-    else:
-        st.warning("⚠️ No relevant information found.")
+            # Extract text
+            ext = file_name.split(".")[-1].lower()
+            text = ""
+
+            with st.spinner("📖 Extracting text..."):
+                try:
+                    if ext == "pdf":
+                        def extract_text_from_pdf(file_path):
+                            doc = fitz.open(file_path)
+                            text = ""
+
+                            for page in doc:
+                                extracted_text = page.get_text("text")  # Get digital text
+                                if not extracted_text.strip():
+                                    # Perform OCR on scanned pages
+                                    pix = page.get_pixmap()
+                                    img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                                    extracted_text = pytesseract.image_to_string(img)
+
+                                text += extracted_text + "\n"
+
+                            doc.close()
+                            return text
+
+                        text = extract_text_from_pdf(file_path)
+
+                    elif ext == "txt":
+                        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                            text = f.read()
+                except Exception as e:
+                    st.error(f"❌ Error extracting text: {e}")
+                    text = ""
+
+            # Clean up temp file
+            os.remove(file_path)
+
+            if text.strip():
+                st.success("✅ Text extracted successfully!")
+
+                # Summarize
+                with st.spinner("📝 Summarizing document..."):
+                    summary = summarizer.summarize(text)
+
+                if summary.strip():
+                    st.success("✅ Summary generated!")
+                    st.text_area("📃 Summary:", summary, height=200)
+
+                    # Store in ChromaDB
+                    with st.spinner("💾 Storing in Knowledge Base..."):
+                        try:
+                            success_message = db_manager.add_summary(file_name, summary)
+                            st.success(success_message)
+                        except Exception as e:
+                            st.error(f"❌ Error storing summary: {e}")
+                else:
+                    st.error("❌ No summary generated!")
+            else:
+                st.error("❌ No text extracted!")
+
+    # === 🗂 Toggle Button to Show/Hide Saved Documents ===
+    if st.checkbox("📜 Show Saved Documents"):
+        saved_docs = db_manager.list_documents() or []
+
+        if saved_docs:
+            selected_doc = st.selectbox("📂 Select a document:", saved_docs)
+
+            if st.button("📖 View Summary"):
+                with st.spinner("🔍 Retrieving summary..."):
+                    summary = db_manager.get_summary(selected_doc)
+
+                if summary and isinstance(summary, str) and summary.strip():
+                    st.text_area("📃 Stored Summary:", summary, height=200)
+                else:
+                    st.warning("⚠️ No summary found!")
+
+            # Option to delete the document
+            if st.button("🗑 Delete Document"):
+                db_manager.delete_document(selected_doc)
+                st.success(f"✅ Deleted {selected_doc}. Refresh the page to update the list.")
+        else:
+            st.info("ℹ️ No saved documents found.")
+
+# ============================
+# 🤖 TAB 2: FAQ CHATBOT (Answer Only)
+# ============================
+with tab2:
+    st.subheader("🤖 FAQ Chatbot")
+
+    # Ensure session state for chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Display previous messages
+    for msg in st.session_state.messages:
+        st.markdown(f"**{msg['role'].capitalize()}:** {msg['content']}")
+
+    # User input
+    query = st.text_input("Ask me anything about stored documents...")
+
+    if query:
+        # Store user query
+        st.session_state.messages.append({"role": "user", "content": query})
+        st.markdown(f"**User:** {query}")
+
+        # Retrieve knowledge from ChromaDB
+        with st.spinner("🔎 Searching knowledge base..."):
+            results = db_manager.search(query, n_results=3)  # Fetch top 3 relevant docs
+
+        if results and "documents" in results and results["documents"]:
+            st.success(f"📖 Found {len(results['documents'])} relevant document(s).")
+
+            # Extract only the relevant document texts
+            context = "\n\n".join(results["documents"][0])
+        else:
+            st.warning("⚠️ No relevant documents found.")
+            context = ""
+
+        # RAG: Generate response using retrieved context (Only Answer, No Summary)
+        with st.spinner("🤖 Thinking..."):
+            answer = summarizer.generate_response(query, context)
+
+        st.markdown(f"""
+        **🤖 Assistant:**  
+        📢 `{answer}`
+        """)
+
+        # Store assistant response
+        st.session_state.messages.append({"role": "assistant", "content": answer})
