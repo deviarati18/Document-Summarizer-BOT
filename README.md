@@ -1,4 +1,4 @@
-🧠 RAG-Based Document Summarizer & FAQ Chatbot
+#🧠 RAG-Based Document Summarizer & FAQ Chatbot
 A Retrieval-Augmented Generation (RAG) system powered by ChromaDB and LLaMA models, featuring a Streamlit UI for document summarization and an FAQ chatbot.
 
 🚀 Features
