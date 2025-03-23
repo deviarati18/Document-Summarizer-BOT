@@ -1,3 +1,8 @@
+
+# 🚀 AI-Powered Document Summarizer
+# Created by Devi C. Arati (@deviarati18) | GitHub: https://github.com/deviarati18
+
+
 import chromadb
 import os
 import streamlit as st  # For better error display in Streamlit apps
